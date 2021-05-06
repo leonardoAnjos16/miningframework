@@ -1,0 +1,4 @@
+path,name
+https://github.com/apache/accumulo,accumulo
+https://github.com/FasterXML/jackson-databind,jackson-databind
+https://github.com/HubSpot/Singularity,Singularity
