@@ -5,6 +5,7 @@ import com.google.inject.*
 import org.junit.Assert
 import org.junit.Test
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -54,24 +55,45 @@ class TestSuite {
     }
 
     private static void checkOutput(Study study) {
-        Path actualOutput = Paths.get(OUTPUT_PATH)
-        Path expectedOutput = Paths.get(study.getOutputPath())
-        assert actualMatchesExpected(actualOutput, expectedOutput)
+        File actualOutput = new File(OUTPUT_PATH)
+        File expectedOutput = new File(study.getOutputPath())
+
+        assert !directoryIsEmpty(actualOutput)
+        deleteNonCSVFiles(actualOutput)
+
+        assert outputMatchesExpected(actualOutput, expectedOutput)
     }
 
-    private static boolean actualMatchesExpected(Path actualOutput, Path expectedOutput) {
-        if (!actualOutput.exists() || expectedOutput.exists()) return false
-        if (actualOutput.getName() != expectedOutput.getName()) return false
+    private static void directoryIsEmpty(File directory) {
+        return directory.list().length == 0
+    }
 
-        if (actualOutput.isFile() && expectedOutput.isFile()) {
-            String actualContent = actualOutput.getText()
-            String expectedContent = expectedOutput.getText()
+    private static void deleteNonCSVFiles(File output) {
+        File[] files = output.listFiles()
+        for (File file: files) {
+            if (file.isFile())
+                assert file.delete()
+            else
+                deleteNonCSVFiles(file)
+        }
+
+        if (directoryIsEmpty(output))
+            assert output.deleteDir()
+    }
+
+    private static boolean outputMatchesExpected(File actual, File expected) {
+        if (!actual.exists() || !expected.exists()) return false
+        if (actual.getName() != expected.getName()) return false
+
+        if (actual.isFile() && expected.isFile()) {
+            String actualContent = actual.getText()
+            String expectedContent = expected.getText()
             return actualContent == expectedContent
         }
 
-        if (actualOutput.isDirectory && expectedOutput.isDirectory()) {
-            File[] actualFiles = actualOutput.listFiles()
-            File[] expectedFiles = expectedOutput.listFiles()
+        if (actual.isDirectory() && expected.isDirectory()) {
+            File[] actualFiles = actual.listFiles()
+            File[] expectedFiles = expected.listFiles()
 
             if (actualFiles.length != expectedFiles.length)
                 return false
@@ -80,7 +102,7 @@ class TestSuite {
             Arrays.sort(expectedFiles)
 
             for (int i = 0; i < actualFiles.length; i++) {
-                if (!actualMatchesExpected(actualFiles, expectedFiles))
+                if (!actualMatchesExpected(actualFiles[i], expectedFiles[i]))
                     return false
             }
 
