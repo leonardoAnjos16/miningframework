@@ -39,11 +39,11 @@ class TestSuite {
 
     private static void runFramework(Study study) {
         Arguments arguments = new Arguments()
-
         arguments.setInputPath(study.getInputPath())
         arguments.setOutputPath(OUTPUT_PATH)
         arguments.setSinceDate(study.getSinceDate())
         arguments.setUntilDate(study.getUntilDate())
+        arguments.setAccessKey(System.getenv("GITHUB_TOKEN"))
 
         Injector injector = Guice.createInjector(study.getInjectorClass().newInstance())
         MiningFramework framework = injector.getInstance(MiningFramework.class)
@@ -64,16 +64,16 @@ class TestSuite {
         assert outputMatchesExpected(actualOutput, expectedOutput)
     }
 
-    private static void directoryIsEmpty(File directory) {
+    private static boolean directoryIsEmpty(File directory) {
         return directory.list().length == 0
     }
 
     private static void deleteNonCSVFiles(File output) {
         File[] files = output.listFiles()
         for (File file: files) {
-            if (file.isFile())
+            if (file.isFile() && file.getName().endsWith(".csv"))
                 assert file.delete()
-            else
+            else if (file.isDirectory())
                 deleteNonCSVFiles(file)
         }
 
