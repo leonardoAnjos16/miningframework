@@ -12,8 +12,9 @@ class MergeSummary {
 
     Map<String, String> mergeContents
     Map<String, Set<MergeConflict>> mergeConflicts
+    Map<String, Long> executionTimes
 
-    MergeSummary(Path filesQuadruplePath) {
+    MergeSummary(Path filesQuadruplePath, Map<String, List<Long>> executionTimes) {
         this.filesQuadruplePath = filesQuadruplePath
 
         Map<String, Path> mergePaths = getMergePaths()
@@ -21,6 +22,7 @@ class MergeSummary {
 
         this.mergeContents = readMergeContents(mergePaths)
         this.mergeConflicts = extractMergeConflicts(mergePaths)
+        this.executionTimes = executionTimes
     }
 
     static List<String> getMergeIds() {
@@ -45,6 +47,11 @@ class MergeSummary {
 
     boolean mergesHaveSameConflicts(String firstMergeId, String secondMergeId) {
         return this.mergeConflicts[firstMergeId] == this.mergeConflicts[secondMergeId]
+    }
+
+    Long getExecutionTime(String mergeId, int runIndex) {
+        println "mergeId = ${mergeId}, runIndex = ${runIndex}, executionTime = ${this.executionTimes[mergeId][runIndex]}"
+        return this.executionTimes[mergeId][runIndex]
     }
 
     private Map<String, Path> getMergePaths() {

@@ -51,6 +51,22 @@ class SpreadsheetBuilder {
                 }
             }
         }
+
+        for (String mergeId: mergeIds) {
+            String currentMergeId = mergeId
+            if (currentMergeId == 'actual') {
+                continue
+            }
+
+            for (int i = 0; i < MergesCollector.getNumberOfRuns(); i++) {
+                int runIndex = i
+                String headerName = "${currentMergeId} - Execution #${runIndex + 1}"
+
+                HEADER_NAME_TO_VALUE_GETTER[headerName] = { _, __, mergeSummary ->
+                    Long.toString(mergeSummary.getExecutionTime(currentMergeId, runIndex))
+                }
+            }
+        }
     }
 
     static synchronized void updateSpreadsheet(Project project, MergeCommit mergeCommit, List<MergeSummary> summaries) {

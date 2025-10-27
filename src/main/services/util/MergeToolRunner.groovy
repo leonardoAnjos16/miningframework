@@ -17,15 +17,18 @@ abstract class MergeToolRunner {
         return mergeToolName
     }
 
-    void collectResults(List<Path> filesQuadruplePaths) {
+    List<Long> collectResults(List<Path> filesQuadruplePaths) {
+        List<Long> executionTimes = []
         filesQuadruplePaths.each { filesQuadruplePath ->
             Path leftFile = getContributionFile(filesQuadruplePath, 'left')
             Path baseFile = getContributionFile(filesQuadruplePath, 'base')
             Path rightFile = getContributionFile(filesQuadruplePath, 'right')
 
             createToolDirectory(filesQuadruplePath)
-            runTool(leftFile, baseFile, rightFile)
+            executionTimes << runTool(leftFile, baseFile, rightFile)
         }
+
+        return executionTimes
     }
 
     protected Path getContributionFile(Path filesQuadruplePath, String contributionFileName) {
@@ -36,14 +39,19 @@ abstract class MergeToolRunner {
         filesQuadruplePath.resolve(mergeToolName).toFile().mkdir()
     }
 
-    protected void runTool(Path leftFile, Path baseFile, Path rightFile) {
+    protected Long runTool(Path leftFile, Path baseFile, Path rightFile) {
         ProcessBuilder processBuilder = buildProcess(leftFile, baseFile, rightFile)
         List<String> parameters = buildParameters(leftFile, baseFile, rightFile)
         processBuilder.command().addAll(parameters)
 
+        Long startTime = System.nanoTime()
+
         Process process = ProcessRunner.startProcess(processBuilder)
         process.getInputStream().eachLine{}
         process.waitFor()
+
+        Long endTime = System.nanoTime()
+        return endTime - startTime
     }
 
     protected Path getOutputPath(Path filesQuadruplePath, String mergeFileName) {
