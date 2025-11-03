@@ -50,7 +50,6 @@ class MergeSummary {
     }
 
     Long getExecutionTime(String mergeId, int runIndex) {
-        println "mergeId = ${mergeId}, runIndex = ${runIndex}, executionTime = ${this.executionTimes[mergeId][runIndex]}"
         return this.executionTimes[mergeId][runIndex]
     }
 
