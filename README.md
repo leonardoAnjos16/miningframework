@@ -198,4 +198,4 @@ One can run the framework tests by running the check task:
 
 ## Building
 
-`.\gradlew build -x test`
+`./gradlew build -x test`

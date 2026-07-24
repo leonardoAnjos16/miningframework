@@ -37,6 +37,8 @@ class ArgsParser {
         this.cli.pd(longOpt: 'pessimistic-dataflow',  "Run pessimistic-dataflow")
         this.cli.report(longOpt: 'report',  "Run report results for experiment using -icf -ioa -idfp -pdg")
         this.cli.r(longOpt: 'reachability',  "Run reachability")
+        this.cli.cg(longOpt: 'callgraph', args: 1, argName: 'algorithm', "Call graph algorithm [CHA, RTA, VTA, SPARK]")
+        this.cli.prt(longOpt: 'partial-results-on-timeout', "When a soot analysis times out, capture and record the partial results found up to that point instead of discarding them")
     }
 
     Arguments parse(args) {
@@ -116,6 +118,16 @@ class ArgsParser {
         }
         if (this.options.r) {
             args.setReachability(true)
+        }
+        if (this.options.cg) {
+            String algorithm = options.cg?.toString()?.trim()?.toUpperCase()
+            if (!algorithm || !["CHA", "RTA", "VTA", "SPARK"].contains(algorithm)) {
+                throw new IllegalArgumentException("Invalid callgraph algorithm: ${options.cg}")
+            }
+            args.setCallgraph(algorithm)
+        }
+        if (this.options.prt) {
+            args.setPartialResultsOnTimeout(true)
         }
     }
 }

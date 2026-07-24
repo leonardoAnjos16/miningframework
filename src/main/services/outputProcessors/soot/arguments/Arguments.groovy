@@ -23,6 +23,8 @@ class Arguments {
     private long timeout
     private long depthLimit
     private boolean printDepthSVFA
+    private String callgraph
+    private boolean partialResultsOnTimeout
 
     Arguments() { // set the default values for all parameters
         isHelp = false
@@ -47,6 +49,8 @@ class Arguments {
         timeout = 240
         printDepthSVFA = false
         depthLimit = 5
+        callgraph = "SPARK"
+        partialResultsOnTimeout = false
     }
 
     boolean getOaIntraWithoutPA() {
@@ -224,5 +228,20 @@ class Arguments {
 
     void setTimeout(long timeout) {
         this.timeout = timeout
+    }
+
+    String getCallgraph() {
+        return callgraph
+    }
+    void setCallgraph(String callgraph) {
+        this.callgraph = callgraph
+    }
+
+    boolean isPartialResultsOnTimeout() {
+        return partialResultsOnTimeout
+    }
+
+    void setPartialResultsOnTimeout(boolean partialResultsOnTimeout) {
+        this.partialResultsOnTimeout = partialResultsOnTimeout
     }
 }
